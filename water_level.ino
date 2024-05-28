@@ -7,8 +7,13 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-const char* ssid     = "xxxx";
-const char* password = "xxxx";
+
+
+#include "config.h"
+
+
+const char *ssid = WIFI_SSID;
+const char *password = WIFI_PASSWORD;
 
 int opticalSensorPin = 0;
 int opticalSensorReading;
