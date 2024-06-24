@@ -27,6 +27,9 @@ DallasTemperature sensors(&oneWire);
 
 // arrays to hold device address
 DeviceAddress insideThermometer;
+DeviceAddress outsideThermometer;
+
+int countTempProbes = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -59,23 +62,44 @@ void setup() {
     // locate devices on the bus
   Serial.print("Locating devices...");
   sensors.begin();
-  Serial.print("Found ");
-  Serial.print(sensors.getDeviceCount(), DEC);
-  Serial.println(" devices.");
 
-  if (!sensors.getAddress(insideThermometer, 0)) Serial.println("Unable to find address for Device 0");
+  countTempProbes = sensors.getDeviceCount();
+
+  if (countTempProbes>0) {
+    Serial.print("Found ");
+    Serial.print(sensors.getDeviceCount(), DEC);
+    Serial.println(" devices.");
+
+
+    if (!sensors.getAddress(insideThermometer, 0)) Serial.println("Unable to find address for Device 0");
+    if (!sensors.getAddress(outsideThermometer, 1)) Serial.println("Unable to find address for Device 1");
+
 
     // show the addresses we found on the bus
-  Serial.print("Device 0 Address: ");
-  printAddress(insideThermometer);
-  Serial.println();
+    Serial.print("Device 0 Address: ");
+    printAddress(insideThermometer);
+    Serial.println();
 
-  // set the resolution to 9 bit (Each Dallas/Maxim device is capable of several different resolutions)
-  sensors.setResolution(insideThermometer, 9);
+    Serial.print("Device 1 Address: ");
+    printAddress(outsideThermometer);
+    Serial.println();
 
-  Serial.print("Device 0 Resolution: ");
-  Serial.print(sensors.getResolution(insideThermometer), DEC);
-  Serial.println();
+    // set the resolution to 9 bit (Each Dallas/Maxim device is capable of several different resolutions)
+    sensors.setResolution(insideThermometer, 9);
+    sensors.setResolution(outsideThermometer, 9);
+
+    Serial.print("Device 0 Resolution: ");
+    Serial.print(sensors.getResolution(insideThermometer), DEC);
+    Serial.println();
+
+    Serial.print("Device 1 Resolution: ");
+    Serial.print(sensors.getResolution(outsideThermometer), DEC);
+    Serial.println();
+
+  } else {
+    Serial.print("No Sensors Found!");
+  }
+
 }
 
 int value = 0;
@@ -121,14 +145,17 @@ void loop() {
     Serial.println(" - TOUCHING WATER - NO");
   }
 
-    // call sensors.requestTemperatures() to issue a global temperature
-  // request to all devices on the bus
-  Serial.print("Requesting temperatures...");
-  sensors.requestTemperatures(); // Send the command to get temperatures
-  Serial.println("DONE");
+  if (countTempProbes>0) {
+      // call sensors.requestTemperatures() to issue a global temperature
+    // request to all devices on the bus
+    Serial.print("Requesting temperatures...");
+    sensors.requestTemperatures(); // Send the command to get temperatures
+    Serial.println("DONE");
 
-  // It responds almost immediately. Let's print out the data
-  printTemperature(insideThermometer); // Use a simple function to print out the data
+    // It responds almost immediately. Let's print out the data
+    printTemperature(insideThermometer); // Use a simple function to print out the data
+    printTemperature(outsideThermometer); // Use a simple function to print out the data
+  }
   
 }
 
